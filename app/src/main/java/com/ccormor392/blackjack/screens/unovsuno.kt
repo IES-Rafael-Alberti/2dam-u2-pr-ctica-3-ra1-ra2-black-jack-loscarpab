@@ -49,69 +49,88 @@ fun UnoVsUno() {
             .padding(vertical = 50.dp, horizontal = 20.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        PintarFilaNombreJugador(jugador = jugador)
-        PintarFilaCartasYPuntuacion(jugador = jugador, puntos = puntos, context = context)
+        PintarFilaNombreJugador(nombreJugador = jugador.nombre)
+        PintarFilaCartasYPuntuacion(
+            manoJugador = jugador.mano,
+            puntos = puntos,
+            context = context
+        )
         PintarFilaBotonesPedirYPasar {
             jugador.mano.cogerCarta(baraja.dameCarta()!!)
-            puntos = jugador.mano.calcularValor().toString()
+            puntos = if (jugador.mano.valorTotal == 21) "¡BlackJack!"
+            else jugador.mano.valorTotal.toString()
         }
-
     }
 }
 
 
 @Composable
-fun PintarFilaNombreJugador(jugador: Jugador){
+fun PintarFilaNombreJugador(nombreJugador: String) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = jugador.nombre.uppercase(),
-            fontSize = 30.sp,
-            color = Color.White,
+        TextoFilaNombre(string = "Turno de: ")
+        TextoFilaNombre(
+            string = nombreJugador.uppercase(),
             fontWeight = FontWeight.Bold
         )
     }
 }
+
 @Composable
-fun PintarFilaCartasYPuntuacion(jugador: Jugador, puntos:String,context:Context){
+fun TextoFilaNombre(string: String, fontWeight: FontWeight = FontWeight.Normal) {
+    Text(
+        text = string,
+        fontSize = 30.sp,
+        color = Color.White,
+        fontWeight = fontWeight
+    )
+}
+
+@Composable
+fun PintarFilaCartasYPuntuacion(manoJugador: Mano, puntos: String, context: Context) {
     Row(
         Modifier
             .height(500.dp)
             .fillMaxWidth()
     ) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = puntos,
-                fontSize = 30.sp,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-            PintarMano(mano = jugador.mano, context = context)
+            PintarMano(mano = manoJugador, context = context)
+            TextoFilaNombre(string = puntos, fontWeight = FontWeight.Bold)
         }
 
     }
 }
+
 @Composable
 fun PintarMano(mano: Mano, context: Context) {
-    var padding = 50
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-        for (cartas in mano.listaCartas) {
-            Box(Modifier.padding(bottom = padding.dp)) {
-                Image(
-                    painter = painterResource(
-                        id = context.resources.getIdentifier(
-                            "carta${cartas.idDrawable}",
-                            "drawable",
-                            context.packageName
-                        )
-                    ), contentDescription = "Carta vista", modifier = Modifier.size(350.dp)
+    var padding = 20
+    Box(Modifier.padding(bottom = 20.dp), contentAlignment = Alignment.TopCenter) {
+        for (carta in mano.listaCartas) {
+            Box(Modifier.padding(top = padding.dp)) {
+                PintarCarta(
+                    context = context,
+                    idDrawable = carta.idDrawable
                 )
             }
-            padding += 30
+            padding += 70
         }
     }
 }
+
 @Composable
-fun PintarFilaBotonesPedirYPasar(onClickPedirCarta:()->Unit){
+fun PintarCarta(context: Context, idDrawable: Int) {
+    Image(
+        painter = painterResource(
+            id = context.resources.getIdentifier(
+                "carta$idDrawable",
+                "drawable",
+                context.packageName
+            )
+        ), contentDescription = "Carta vista", modifier = Modifier.size(250.dp)
+    )
+}
+
+@Composable
+fun PintarFilaBotonesPedirYPasar(onClickPedirCarta: () -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         Button(onClick = {
             onClickPedirCarta()

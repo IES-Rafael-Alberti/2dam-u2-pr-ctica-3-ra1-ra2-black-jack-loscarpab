@@ -8,16 +8,10 @@ class Mano():Serializable {
 
     fun cogerCarta(carta: Carta){
         listaCartas.add(carta)
-        valorTotal+=carta.puntosMin
+        calcularValor(carta)
     }
-    fun calcularValor():Int{
-        var valor = 0
-        if (listaCartas.isNotEmpty()){
-            for (carta in listaCartas){
-                valor += carta.puntosMin
-            }
-        }
-        return valor
+    fun calcularValor(carta: Carta){
+        valorTotal += carta.puntosMin
     }
 
     override fun toString(): String {
