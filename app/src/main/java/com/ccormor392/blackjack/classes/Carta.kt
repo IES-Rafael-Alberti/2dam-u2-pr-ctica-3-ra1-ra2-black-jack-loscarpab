@@ -11,9 +11,9 @@ package com.ccormor392.blackjack.classes
  * @see Palo
  * @see Naipe
  */
-class Carta(palo: Palo,nombre: Naipe) {
-    private var puntosMin:Int
-    private var puntosMax:Int
+class Carta(var palo: Palo,var nombre: Naipe) {
+    var puntosMin:Int
+    var puntosMax:Int
     var idDrawable:Int
     init {
         //si es un As sus valores puedes ser 11 y 1
@@ -33,5 +33,9 @@ class Carta(palo: Palo,nombre: Naipe) {
         }
         //segun como he organizado los nombres de los archivos con las cartas en mi proyecto el id se calcula asi.
         idDrawable = nombre.valor + 13 * palo.valor
+    }
+
+    override fun toString(): String {
+        return "Carta(palo=${palo.name}, nombre=${nombre.name})"
     }
 }
