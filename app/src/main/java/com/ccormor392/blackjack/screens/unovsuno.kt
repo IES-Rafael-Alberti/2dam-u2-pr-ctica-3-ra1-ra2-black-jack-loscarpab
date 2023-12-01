@@ -49,6 +49,7 @@ fun UnoVsUno() {
         puntos = if (jugadorVisto.mano.valorTotal == 21) "¡BlackJack!"
         else jugadorVisto.mano.valorTotal.toString()
         jugadorVisto = partida.jugador2
+        println("pruebacommit")
     }
 
 }
