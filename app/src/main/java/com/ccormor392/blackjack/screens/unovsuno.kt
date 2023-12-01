@@ -33,15 +33,28 @@ import com.ccormor392.blackjack.R
 import com.ccormor392.blackjack.classes.Baraja
 import com.ccormor392.blackjack.classes.Jugador
 import com.ccormor392.blackjack.classes.Mano
+import com.ccormor392.blackjack.classes.Partida
 
 @Preview
 @Composable
 fun UnoVsUno() {
-    val jugador by rememberSaveable { mutableStateOf(Jugador("pepe")) }
+    val partida by rememberSaveable { mutableStateOf(Partida()) }
+    var jugadorVisto by rememberSaveable { mutableStateOf(partida.jugador1) }
     var puntos by rememberSaveable { mutableStateOf("") }
     val context = LocalContext.current
     val baraja = Baraja
 
+    TodaLaPantalla(jugador = jugadorVisto, context = context, puntos = puntos) {
+        jugadorVisto.mano.cogerCarta(baraja.dameCarta()!!)
+        puntos = if (jugadorVisto.mano.valorTotal == 21) "¡BlackJack!"
+        else jugadorVisto.mano.valorTotal.toString()
+        jugadorVisto = partida.jugador2
+    }
+
+}
+
+@Composable
+fun TodaLaPantalla(jugador: Jugador, context: Context, puntos: String, onClickPedirCarta: () -> Unit){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -56,14 +69,10 @@ fun UnoVsUno() {
             context = context
         )
         PintarFilaBotonesPedirYPasar {
-            jugador.mano.cogerCarta(baraja.dameCarta()!!)
-            puntos = if (jugador.mano.valorTotal == 21) "¡BlackJack!"
-            else jugador.mano.valorTotal.toString()
+            onClickPedirCarta()
         }
     }
 }
-
-
 @Composable
 fun PintarFilaNombreJugador(nombreJugador: String) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
@@ -89,7 +98,7 @@ fun TextoFilaNombre(string: String, fontWeight: FontWeight = FontWeight.Normal) 
 fun PintarFilaCartasYPuntuacion(manoJugador: Mano, puntos: String, context: Context) {
     Row(
         Modifier
-            .height(500.dp)
+            .height(560.dp)
             .fillMaxWidth()
     ) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -111,7 +120,7 @@ fun PintarMano(mano: Mano, context: Context) {
                     idDrawable = carta.idDrawable
                 )
             }
-            padding += 70
+            padding += 30
         }
     }
 }
