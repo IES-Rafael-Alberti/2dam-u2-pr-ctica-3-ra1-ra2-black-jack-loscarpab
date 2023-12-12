@@ -15,10 +15,17 @@ class UnovsunoViewModel(application: Application): AndroidViewModel(application)
     val context = getApplication<Application>().applicationContext
 
     private val _jugador = MutableLiveData<Jugador>()
-    val jugador: LiveData<Jugador> = _jugador
+    private val _puntosJugador = MutableLiveData<Int>()
+    private val _jugador2 = MutableLiveData<Jugador>()
+    private val _puntosJugador2 = MutableLiveData<Int>()
 
-    private val _puntos = MutableLiveData<Int>()
-    val puntos: LiveData<Int> = _puntos
+    private val _jugadorActivo = MutableLiveData<Jugador>()
+    val jugadorActivo: LiveData<Jugador> = _jugadorActivo
+
+    private val _turnoJ1 = MutableLiveData<Boolean>()
+
+    private val _puntosJugadorActivo = MutableLiveData<Int>()
+    val puntosJugadorActivo: LiveData<Int> = _puntosJugadorActivo
 
     init {
         restart()
@@ -26,19 +33,37 @@ class UnovsunoViewModel(application: Application): AndroidViewModel(application)
     }
 
     fun pedirCarta(){
-        val mano = _jugador.value!!.mano
+        val mano = _jugadorActivo.value!!.mano
         val cartaCogida = Baraja.dameCarta()!!
         mano.listaCartas.add(cartaCogida)
-        _jugador.value = _jugador.value!!.copy(mano = mano)
+        _jugadorActivo.value = _jugador.value!!.copy(mano = mano)
         calcPoints(cartaCogida)
     }
+    fun cambiarTurno(){
+        _turnoJ1.value = !_turnoJ1.value!!
+        if (_turnoJ1.value!!){
+            _jugadorActivo.value = _jugador.value
+            _puntosJugador2.value = _puntosJugadorActivo.value
+            _puntosJugadorActivo.value = _puntosJugador.value
+        }
+        else{
+            _jugadorActivo.value = _jugador2.value
+            _puntosJugador.value = _puntosJugadorActivo.value
+            _puntosJugadorActivo.value = _puntosJugador2.value
+        }
+    }
     private fun calcPoints(carta: Carta) {
-        if (carta.nombre.valor == 1 && _puntos.value!! + carta.puntosMin < 21)
-           _puntos.value = _puntos.value!! + carta.puntosMax
-        else _puntos.value = _puntos.value!! + carta.puntosMin
+        if (carta.nombre.valor == 1 && _puntosJugadorActivo.value!! + carta.puntosMin < 21)
+           _puntosJugadorActivo.value = _puntosJugadorActivo.value!! + carta.puntosMax
+        else _puntosJugadorActivo.value = _puntosJugadorActivo.value!! + carta.puntosMin
     }
     fun restart(){
         _jugador.value = Jugador("Pepe")
-        _puntos.value = 0
+        _puntosJugador.value = 0
+        _jugador2.value = Jugador("joselui")
+        _puntosJugador2.value = 0
+        _jugadorActivo.value = _jugador.value
+        _turnoJ1.value = true
+        _puntosJugadorActivo.value = 0
     }
 }

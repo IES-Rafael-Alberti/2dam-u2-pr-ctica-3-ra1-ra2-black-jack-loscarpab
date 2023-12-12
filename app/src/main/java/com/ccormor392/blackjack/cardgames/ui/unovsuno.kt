@@ -1,6 +1,5 @@
 package com.ccormor392.blackjack.cardgames.ui
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,11 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
@@ -29,15 +24,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Observer
 import com.ccormor392.blackjack.R
 import com.ccormor392.blackjack.cardgames.data.Mano
 
 
 @Composable
 fun UnoVsUno(viewModel: UnovsunoViewModel) {
-    val jugador by viewModel.jugador.observeAsState()
-    val puntos by viewModel.puntos.observeAsState()
+    val jugador by viewModel.jugadorActivo.observeAsState()
+    val puntos by viewModel.puntosJugadorActivo.observeAsState()
+
 
     Column(
         modifier = Modifier
@@ -51,9 +46,10 @@ fun UnoVsUno(viewModel: UnovsunoViewModel) {
             manoJugador = jugador!!.mano,
             puntos = puntos!!,
         )
-        PintarFilaBotonesPedirYPasar {
-            viewModel.pedirCarta()
-        }
+        PintarFilaBotonesPedirYPasar (
+            onClickPedirCarta = { viewModel.pedirCarta() },
+            onClickPasarTurno = { viewModel.cambiarTurno() }
+        )
     }
 }
 
@@ -118,7 +114,7 @@ fun PintarCarta(idDrawable: Int) {
 }
 
 @Composable
-fun PintarFilaBotonesPedirYPasar(onClickPedirCarta: () -> Unit) {
+fun PintarFilaBotonesPedirYPasar(onClickPedirCarta: () -> Unit, onClickPasarTurno: () -> Unit) {
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         Button(onClick = {
             onClickPedirCarta()
@@ -127,6 +123,9 @@ fun PintarFilaBotonesPedirYPasar(onClickPedirCarta: () -> Unit) {
         }
         Button(onClick = { /*TODO*/ }) {
             Text(text = "Plantarme")
+        }
+        Button(onClick = { onClickPasarTurno() }) {
+            Text(text = "Pasar Turno")
         }
     }
 }
