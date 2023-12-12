@@ -1,4 +1,4 @@
-package com.ccormor392.blackjack.screens
+package com.ccormor392.blackjack.cardgames.ui
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -25,7 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ccormor392.blackjack.R
-import com.ccormor392.blackjack.classes.Baraja
+import com.ccormor392.blackjack.cardgames.data.Baraja
 
 
 @Preview(showBackground = true)
@@ -76,7 +76,7 @@ fun MuestraCarta() {
             //boton para reiniciar la baraja
             Button(onClick = {
                 //llamamos a baraja para que cree de nuevo otra baraja
-                baraja.crearBaraja()
+                //baraja.crearBaraja()
                 //y cambiamos el nombreDrawable para que se muestre el reverso
                 nombreDrawable = "reverso"
                 Toast.makeText(context, "Baraja reiniciada!", Toast.LENGTH_SHORT).show()

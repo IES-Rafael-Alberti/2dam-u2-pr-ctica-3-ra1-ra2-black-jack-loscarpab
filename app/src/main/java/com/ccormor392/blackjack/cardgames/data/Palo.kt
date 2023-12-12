@@ -1,4 +1,4 @@
-package com.ccormor392.blackjack.classes
+package com.ccormor392.blackjack.cardgames.data
 
 /**
  * Los palos que puede tener una carta, en este caso, de una baraja francesa

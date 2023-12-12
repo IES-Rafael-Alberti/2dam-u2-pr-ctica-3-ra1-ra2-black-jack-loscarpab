@@ -1,4 +1,6 @@
-package com.ccormor392.blackjack.classes
+package com.ccormor392.blackjack.cardgames.data
+
+import java.io.Serializable
 
 /**
  * Contiene el nombre y el palo de una carta
@@ -11,10 +13,10 @@ package com.ccormor392.blackjack.classes
  * @see Palo
  * @see Naipe
  */
-class Carta(var palo: Palo,var nombre: Naipe) {
+data class Carta(var palo: Palo, var nombre: Naipe, var idDrawable:Int) {
     var puntosMin:Int
     var puntosMax:Int
-    var idDrawable:Int
+
     init {
         //si es un As sus valores puedes ser 11 y 1
         if (nombre.valor == 1){
@@ -31,11 +33,6 @@ class Carta(var palo: Palo,var nombre: Naipe) {
             puntosMax = nombre.valor
             puntosMin = nombre.valor
         }
-        //segun como he organizado los nombres de los archivos con las cartas en mi proyecto el id se calcula asi.
-        idDrawable = nombre.valor + 13 * palo.valor
     }
 
-    override fun toString(): String {
-        return "Carta(palo=${palo.name}, nombre=${nombre.name})"
-    }
 }

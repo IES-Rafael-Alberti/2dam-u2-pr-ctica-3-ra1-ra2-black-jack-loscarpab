@@ -1,4 +1,7 @@
-package com.ccormor392.blackjack.classes
+package com.ccormor392.blackjack.cardgames.data
+
+import android.content.Context
+import com.ccormor392.blackjack.cardgames.data.Baraja.Companion.listaBaraja
 
 /**
  * Una clase que usa un companion object para que se pueda llamar a sus metodos sin crear un objeto.
@@ -8,32 +11,43 @@ package com.ccormor392.blackjack.classes
  * @constructor Cuando se inicia se crea la baraja
  */
 class Baraja {
-    companion object{
+    companion object {
         private var listaBaraja = arrayListOf<Carta>()
-        init {
-            crearBaraja()
-        }
 
         /**
          * Primero borra la lista de barajas para facilitar el reinicio de la baraja y despues recorriendo los valores de los enum Palo y Naipe se van creando las cartas. Cuando añade todas las cartas las baraja
          * @see Palo
          * @see Naipe
          */
-        fun crearBaraja(){
+        fun crearBaraja(context: Context) {
             listaBaraja.clear()
-            for (paloIterator in Palo.values()){
-                for (numeroIterator in Naipe.values()){
-                    val carta = Carta(paloIterator, numeroIterator)
+            for (paloIterator in Palo.values()) {
+                for (numeroIterator in Naipe.values()) {
+                    val idDrawableTemp = numeroIterator.valor + (13 * paloIterator.valor)
+                    val carta = Carta(
+                        paloIterator, numeroIterator, getDrawableCarta(
+                            context,
+                            "carta$idDrawableTemp"
+                        )
+                    )
                     listaBaraja.add(carta)
                 }
             }
             barajar()
         }
 
+        private fun getDrawableCarta(context: Context, nombreCarta: String): Int {
+            return context.resources.getIdentifier(
+                nombreCarta,
+                "drawable",
+                context.packageName
+            )
+        }
+
         /**
          * Desordena el array list de Cartas
          */
-        private fun barajar(){
+        private fun barajar() {
             listaBaraja.shuffle()
         }
 
@@ -41,7 +55,7 @@ class Baraja {
          * Si queda cartas en la baraja te la devuelve
          * @return objeto tipo Carta si quedan, si no, null
          */
-        fun dameCarta():Carta?{
+        fun dameCarta(): Carta? {
             if (listaBaraja.size > 0) {
                 val ultimo = listaBaraja.last()
                 listaBaraja.remove(ultimo)

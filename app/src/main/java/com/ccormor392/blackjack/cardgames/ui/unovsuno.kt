@@ -1,4 +1,4 @@
-package com.ccormor392.blackjack.screens
+package com.ccormor392.blackjack.cardgames.ui
 
 import android.content.Context
 import androidx.compose.foundation.Image
@@ -15,47 +15,30 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Observer
 import com.ccormor392.blackjack.R
-import com.ccormor392.blackjack.classes.Baraja
-import com.ccormor392.blackjack.classes.Jugador
-import com.ccormor392.blackjack.classes.Mano
-import com.ccormor392.blackjack.classes.Partida
+import com.ccormor392.blackjack.cardgames.data.Mano
 
-@Preview
-@Composable
-fun UnoVsUno() {
-    val partida by rememberSaveable { mutableStateOf(Partida()) }
-    var jugadorVisto by rememberSaveable { mutableStateOf(partida.jugador1) }
-    var puntos by rememberSaveable { mutableStateOf("") }
-    val context = LocalContext.current
-    val baraja = Baraja
-
-    TodaLaPantalla(jugador = jugadorVisto, context = context, puntos = puntos) {
-        jugadorVisto.mano.cogerCarta(baraja.dameCarta()!!)
-        puntos = if (jugadorVisto.mano.valorTotal == 21) "¡BlackJack!"
-        else jugadorVisto.mano.valorTotal.toString()
-        jugadorVisto = partida.jugador2
-        println("pruebacommitv2")
-    }
-
-}
 
 @Composable
-fun TodaLaPantalla(jugador: Jugador, context: Context, puntos: String, onClickPedirCarta: () -> Unit){
+fun UnoVsUno(viewModel: UnovsunoViewModel) {
+    val jugador by viewModel.jugador.observeAsState()
+    val puntos by viewModel.puntos.observeAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -63,17 +46,17 @@ fun TodaLaPantalla(jugador: Jugador, context: Context, puntos: String, onClickPe
             .padding(vertical = 50.dp, horizontal = 20.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        PintarFilaNombreJugador(nombreJugador = jugador.nombre)
+        PintarFilaNombreJugador(nombreJugador = jugador!!.nombre)
         PintarFilaCartasYPuntuacion(
-            manoJugador = jugador.mano,
-            puntos = puntos,
-            context = context
+            manoJugador = jugador!!.mano,
+            puntos = puntos!!,
         )
         PintarFilaBotonesPedirYPasar {
-            onClickPedirCarta()
+            viewModel.pedirCarta()
         }
     }
 }
+
 @Composable
 fun PintarFilaNombreJugador(nombreJugador: String) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
@@ -96,28 +79,27 @@ fun TextoFilaNombre(string: String, fontWeight: FontWeight = FontWeight.Normal) 
 }
 
 @Composable
-fun PintarFilaCartasYPuntuacion(manoJugador: Mano, puntos: String, context: Context) {
+fun PintarFilaCartasYPuntuacion(manoJugador: Mano, puntos: Int) {
     Row(
         Modifier
             .height(560.dp)
             .fillMaxWidth()
     ) {
         Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            PintarMano(mano = manoJugador, context = context)
-            TextoFilaNombre(string = puntos, fontWeight = FontWeight.Bold)
+            PintarMano(mano = manoJugador)
+            TextoFilaNombre(string = puntos.toString(), fontWeight = FontWeight.Bold)
         }
 
     }
 }
 
 @Composable
-fun PintarMano(mano: Mano, context: Context) {
+fun PintarMano(mano: Mano) {
     var padding = 20
     Box(Modifier.padding(bottom = 20.dp), contentAlignment = Alignment.TopCenter) {
         for (carta in mano.listaCartas) {
             Box(Modifier.padding(top = padding.dp)) {
                 PintarCarta(
-                    context = context,
                     idDrawable = carta.idDrawable
                 )
             }
@@ -127,14 +109,10 @@ fun PintarMano(mano: Mano, context: Context) {
 }
 
 @Composable
-fun PintarCarta(context: Context, idDrawable: Int) {
+fun PintarCarta(idDrawable: Int) {
     Image(
         painter = painterResource(
-            id = context.resources.getIdentifier(
-                "carta$idDrawable",
-                "drawable",
-                context.packageName
-            )
+            id = idDrawable
         ), contentDescription = "Carta vista", modifier = Modifier.size(250.dp)
     )
 }

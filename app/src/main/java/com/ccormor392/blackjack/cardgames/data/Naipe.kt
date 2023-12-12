@@ -1,4 +1,4 @@
-package com.ccormor392.blackjack.classes
+package com.ccormor392.blackjack.cardgames.data
 
 /**
  * El nombre que puede tener el valor de una carta, en este caso, el de una baraja francesa
