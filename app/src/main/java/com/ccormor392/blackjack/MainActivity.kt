@@ -8,24 +8,51 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.ccormor392.blackjack.cardgames.data.Rutas.*
+import com.ccormor392.blackjack.cardgames.ui.MenuPrincipal
 import com.ccormor392.blackjack.cardgames.ui.MuestraCarta
 import com.ccormor392.blackjack.cardgames.ui.UnoVsUno
-import com.ccormor392.blackjack.cardgames.ui.UnovsunoViewModel
-import com.ccormor392.blackjack.ui.theme.BlackjackTheme
+import com.ccormor392.blackjack.cardgames.ui.UnovsUnoViewModel
+
 
 class MainActivity : ComponentActivity() {
-    private val viewModel:UnovsunoViewModel by viewModels()
+    private val viewModel:UnovsUnoViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            BlackjackTheme {
+            MaterialTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    UnoVsUno(viewModel = viewModel)
+                    val navController = rememberNavController()
+
+                    NavHost(
+                        navController = navController,
+                        startDestination = MenuPrincipal.ruta
+                    ) {
+                        composable(MenuPrincipal.ruta) {
+                            MenuPrincipal(
+                                navController = navController
+                            )
+                        }
+                        composable(UnovsUno.ruta) {
+                            UnoVsUno(
+                                viewModel = viewModel,
+                                navController = navController
+                            )
+                        }
+                        composable(MuestraCarta.ruta) {
+                            MuestraCarta(
+                                navController = navController
+                            )
+                        }
+                    }
                 }
             }
         }

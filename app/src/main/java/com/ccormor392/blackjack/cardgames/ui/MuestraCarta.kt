@@ -1,6 +1,7 @@
 package com.ccormor392.blackjack.cardgames.ui
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,16 +25,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.ccormor392.blackjack.R
 import com.ccormor392.blackjack.cardgames.data.Baraja
 
 
-@Preview(showBackground = true)
+
 @Composable
-fun MuestraCarta() {
+fun MuestraCarta(navController: NavHostController) {
     val context = LocalContext.current
     var nombreDrawable by rememberSaveable { mutableStateOf("reverso") }
     val baraja = Baraja
+
+    BackHandler {
+        navController.popBackStack()
+    }
+
     //columna que actua como fondo de la pantalla, en este caso con una imagen
     Column(
         modifier = Modifier

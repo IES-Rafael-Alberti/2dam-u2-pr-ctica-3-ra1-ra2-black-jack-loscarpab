@@ -1,5 +1,6 @@
 package com.ccormor392.blackjack.cardgames.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,7 +11,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,14 +28,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.ccormor392.blackjack.R
-import com.ccormor392.blackjack.cardgames.data.Mano
+import com.ccormor392.blackjack.cardgames.data.Carta
 
 
 @Composable
-fun UnoVsUno(viewModel: UnovsunoViewModel) {
+fun UnoVsUno(viewModel: UnovsUnoViewModel, navController: NavHostController) {
     val jugador by viewModel.jugadorActivo.observeAsState()
     val puntos by viewModel.puntosJugadorActivo.observeAsState()
+    val puedePasarTurno by viewModel.puedePasarTurno.observeAsState()
+    val mostrarDialogoNombres by viewModel.mostrarIngresarNombres.observeAsState()
+
+    BackHandler {
+        viewModel.restart()
+        navController.popBackStack()
+    }
+
+    if (mostrarDialogoNombres!!) {
+        DialogoNombreJugadores(onNamesEntered = {
+            viewModel.nombresYaMetidos()
+            viewModel.cambiarNombres()
+        }, viewModel = viewModel)
+    }
 
 
     Column(
@@ -43,12 +62,13 @@ fun UnoVsUno(viewModel: UnovsunoViewModel) {
     ) {
         PintarFilaNombreJugador(nombreJugador = jugador!!.nombre)
         PintarFilaCartasYPuntuacion(
-            manoJugador = jugador!!.mano,
+            manoJugador = jugador!!.listaCartas,
             puntos = puntos!!,
         )
-        PintarFilaBotonesPedirYPasar (
+        PintarFilaBotonesPedirYPasar(
             onClickPedirCarta = { viewModel.pedirCarta() },
-            onClickPasarTurno = { viewModel.cambiarTurno() }
+            onClickPasarTurno = { viewModel.cambiarTurno() },
+            puedePasarTurno!!
         )
     }
 }
@@ -75,7 +95,7 @@ fun TextoFilaNombre(string: String, fontWeight: FontWeight = FontWeight.Normal) 
 }
 
 @Composable
-fun PintarFilaCartasYPuntuacion(manoJugador: Mano, puntos: Int) {
+fun PintarFilaCartasYPuntuacion(manoJugador: MutableList<Carta>, puntos: Int) {
     Row(
         Modifier
             .height(560.dp)
@@ -90,10 +110,10 @@ fun PintarFilaCartasYPuntuacion(manoJugador: Mano, puntos: Int) {
 }
 
 @Composable
-fun PintarMano(mano: Mano) {
+fun PintarMano(mano: MutableList<Carta>) {
     var padding = 20
     Box(Modifier.padding(bottom = 20.dp), contentAlignment = Alignment.TopCenter) {
-        for (carta in mano.listaCartas) {
+        for (carta in mano) {
             Box(Modifier.padding(top = padding.dp)) {
                 PintarCarta(
                     idDrawable = carta.idDrawable
@@ -114,18 +134,79 @@ fun PintarCarta(idDrawable: Int) {
 }
 
 @Composable
-fun PintarFilaBotonesPedirYPasar(onClickPedirCarta: () -> Unit, onClickPasarTurno: () -> Unit) {
+fun PintarFilaBotonesPedirYPasar(
+    onClickPedirCarta: () -> Unit,
+    onClickPasarTurno: () -> Unit,
+    puedePasarTurno: Boolean
+) {
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
         Button(onClick = {
             onClickPedirCarta()
-        }) {
+        }, enabled = !puedePasarTurno) {
             Text(text = "Pedir carta")
         }
-        Button(onClick = { /*TODO*/ }) {
+        Button(onClick = { /*TODO*/ }, enabled = !puedePasarTurno) {
             Text(text = "Plantarme")
         }
-        Button(onClick = { onClickPasarTurno() }) {
+        Button(onClick = { onClickPasarTurno() }, enabled = puedePasarTurno) {
             Text(text = "Pasar Turno")
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DialogoNombreJugadores(onNamesEntered: () -> Unit, viewModel: UnovsUnoViewModel) {
+    // Observar los cambios en los nombres de los jugadores desde el ViewModel
+    val nombreJ1 by viewModel.nombreDialogoJ1.observeAsState("")
+    val nombreJ2 by viewModel.nombreDialogoJ2.observeAsState("")
+
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text("Ingrese los nombres de los jugadores") },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(320.dp)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                // Campo de texto para el nombre del Jugador 1
+                OutlinedTextField(
+                    value = nombreJ1,
+                    onValueChange = { viewModel.cambiarNombreJ1(it) },
+                    label = { Text("Nombre del Jugador 1") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                )
+
+                // Campo de texto para el nombre del Jugador 2
+                OutlinedTextField(
+                    value = nombreJ2,
+                    onValueChange = { viewModel.cambiarNombreJ2(it) },
+                    label = { Text("Nombre del Jugador 2") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onNamesEntered()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+            ) {
+                Text("Aceptar")
+            }
+        })
+
+}
+
+
