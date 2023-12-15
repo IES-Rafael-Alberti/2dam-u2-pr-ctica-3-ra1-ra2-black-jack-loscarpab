@@ -14,12 +14,14 @@ import androidx.navigation.compose.rememberNavController
 import com.ccormor392.blackjack.cardgames.data.Rutas.*
 import com.ccormor392.blackjack.cardgames.ui.MenuPrincipal
 import com.ccormor392.blackjack.cardgames.ui.MuestraCarta
+import com.ccormor392.blackjack.cardgames.ui.MuestraCartaViewModel
 import com.ccormor392.blackjack.cardgames.ui.UnoVsUno
 import com.ccormor392.blackjack.cardgames.ui.UnovsUnoViewModel
 
 
 class MainActivity : ComponentActivity() {
-    private val viewModel:UnovsUnoViewModel by viewModels()
+    private val unoVsUnoViewModel:UnovsUnoViewModel by viewModels()
+    private val muestraCartaViewModel:MuestraCartaViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -43,13 +45,14 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(UnovsUno.ruta) {
                             UnoVsUno(
-                                viewModel = viewModel,
+                                unoVsUnoViewModel = unoVsUnoViewModel,
                                 navController = navController
                             )
                         }
                         composable(MuestraCarta.ruta) {
                             MuestraCarta(
-                                navController = navController
+                                navController = navController,
+                                muestraCartaViewModel
                             )
                         }
                     }

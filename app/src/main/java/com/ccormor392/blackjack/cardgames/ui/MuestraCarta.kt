@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -33,10 +34,8 @@ import com.ccormor392.blackjack.cardgames.data.Baraja
 
 
 @Composable
-fun MuestraCarta(navController: NavHostController) {
-    val context = LocalContext.current
-    var nombreDrawable by rememberSaveable { mutableStateOf("reverso") }
-    val baraja = Baraja
+fun MuestraCarta(navController: NavHostController, muestraCartaViewModel: MuestraCartaViewModel) {
+    val nombreDrawable by muestraCartaViewModel.nombreDrawable.observeAsState()
 
     BackHandler {
         navController.popBackStack()
@@ -55,11 +54,7 @@ fun MuestraCarta(navController: NavHostController) {
         //carta mostrada en pantalla
         Image(
             painter = painterResource(
-                id = context.resources.getIdentifier(
-                    "carta$nombreDrawable",
-                    "drawable",
-                    context.packageName
-                )
+                id = nombreDrawable!!
             ), contentDescription = "Carta vista", modifier = Modifier.size(400.dp)
         )
         //linea de botones
@@ -70,24 +65,13 @@ fun MuestraCarta(navController: NavHostController) {
         ) {
             //Boton para pedir carta
             Button(onClick = {
-                val cartaMostrada = baraja.dameCarta()//pide carta a la baraja
-                if (cartaMostrada == null) {
-                    //si carta mostrada es null significa que la baraja se ha quedado sin cartas
-                    nombreDrawable = "reverso"
-                    Toast.makeText(context, "No quedan mas cartas", Toast.LENGTH_SHORT).show()
-                }
-                //si no es nula cambiamos la variable nombreDrawable con el id de la carta cogida de la baraja
-                else nombreDrawable = cartaMostrada.idDrawable.toString()
+               muestraCartaViewModel.dameCarta()
             }, modifier = Modifier.padding(end = 10.dp)) {
                 Text(text = "Dame una carta")
             }
             //boton para reiniciar la baraja
             Button(onClick = {
-                //llamamos a baraja para que cree de nuevo otra baraja
-                //baraja.crearBaraja()
-                //y cambiamos el nombreDrawable para que se muestre el reverso
-                nombreDrawable = "reverso"
-                Toast.makeText(context, "Baraja reiniciada!", Toast.LENGTH_SHORT).show()
+                muestraCartaViewModel.restart()
             }) {
                 Text(text = "Reiniciar")
             }
