@@ -1,6 +1,6 @@
 package com.ccormor392.blackjack.cardgames.data
 
-import java.io.Serializable
+
 
 /**
  * Contiene el nombre y el palo de una carta

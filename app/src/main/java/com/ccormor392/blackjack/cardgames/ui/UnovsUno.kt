@@ -36,7 +36,11 @@ import com.ccormor392.blackjack.R
 import com.ccormor392.blackjack.cardgames.data.Carta
 import com.ccormor392.blackjack.cardgames.data.Rutas.*
 
-
+/**
+ * funcion composable que pinta toda la pantalla
+ * @param unoVsUnoViewModel el viewModel que maneja la logica
+ * @param navController usado para navegar entre pantallas
+ */
 @Composable
 fun UnoVsUno(unoVsUnoViewModel: UnovsUnoViewModel, navController: NavHostController) {
     val jugador by unoVsUnoViewModel.jugadorActivo.observeAsState()
@@ -45,11 +49,12 @@ fun UnoVsUno(unoVsUnoViewModel: UnovsUnoViewModel, navController: NavHostControl
     val mostrarDialogoNombres by unoVsUnoViewModel.mostrarIngresarNombres.observeAsState()
     val mostrarDialogoFinPartida by unoVsUnoViewModel.mostrarPartidaFinalizada.observeAsState()
 
+    //gestiona que hace si se vuelve hacia atras
     BackHandler {
         unoVsUnoViewModel.restart()
         navController.popBackStack()
     }
-
+    //si ha finalizado la partida se muestra su dialogo
     if (mostrarDialogoFinPartida!!){
         DialogoFinPartida(
             ganador = unoVsUnoViewModel.resultadoPartida(),
@@ -58,14 +63,14 @@ fun UnoVsUno(unoVsUnoViewModel: UnovsUnoViewModel, navController: NavHostControl
             onVolverInicioClick = { navController.navigate(MenuPrincipal.ruta) },
             onNuevaPartidaClick = {unoVsUnoViewModel.restart()})
     }
-
+    //si hay que introducir los nombres se muestra su dialogo
     if (mostrarDialogoNombres!!) {
         DialogoNombreJugadores(onNamesEntered = {
             unoVsUnoViewModel.aceptarDialogoNombres()
         }, viewModel = unoVsUnoViewModel)
     }
 
-
+    //columna usada para poner la imagen de fondo
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,6 +91,9 @@ fun UnoVsUno(unoVsUnoViewModel: UnovsUnoViewModel, navController: NavHostControl
     }
 }
 
+/**
+ * funcion composable que muestra un texto "Turno de" y el nombre del jugador que sea su turno
+ */
 @Composable
 fun PintarFilaNombreJugador(nombreJugador: String) {
     Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
@@ -97,6 +105,10 @@ fun PintarFilaNombreJugador(nombreJugador: String) {
     }
 }
 
+/**
+ * funcion composable usada para definir el mismo al texto de la fila del turno
+ * @see TextoFilaNombre
+ */
 @Composable
 fun TextoFilaNombre(string: String, fontWeight: FontWeight = FontWeight.Normal) {
     Text(
@@ -107,6 +119,9 @@ fun TextoFilaNombre(string: String, fontWeight: FontWeight = FontWeight.Normal) 
     )
 }
 
+/**
+ * funcion composable se muestran las cartas y
+ */
 @Composable
 fun PintarFilaCartasYPuntuacion(manoJugador: MutableList<Carta>, puntos: Int) {
     Row(
@@ -172,7 +187,6 @@ fun PintarFilaBotonesPedirYPasar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DialogoNombreJugadores(onNamesEntered: () -> Unit, viewModel: UnovsUnoViewModel) {
-    // Observar los cambios en los nombres de los jugadores desde el ViewModel
     val nombreJ1 by viewModel.nombreDialogoJ1.observeAsState("")
     val nombreJ2 by viewModel.nombreDialogoJ2.observeAsState("")
 
